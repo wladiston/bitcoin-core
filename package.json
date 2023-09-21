@@ -66,6 +66,7 @@
     "mocha": "--timeout 20000 --recursive --require should"
   },
   "pre-commit": [
-    "lint"
+    "lint",
+    "format"
   ]
 }
