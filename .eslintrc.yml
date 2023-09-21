@@ -1,1 +1,3 @@
 extends: uphold
+rules:
+  operator-linebreak: [none]

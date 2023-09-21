@@ -3,7 +3,7 @@
 /** @type {import("prettier").Config} */
 module.exports = {
   arrowParens: 'avoid',
-  bracketSpacing: false,
+  bracketSpacing: true,
   embeddedLanguageFormatting: 'auto',
   endOfLine: 'lf',
   htmlWhitespaceSensitivity: 'css',
@@ -13,9 +13,9 @@ module.exports = {
   proseWrap: 'always',
   quoteProps: 'as-needed',
   requirePragma: false,
-  semi: false,
+  semi: true,
   singleQuote: true,
   tabWidth: 2,
-  trailingComma: 'all',
-  useTabs: false,
-}
+  trailingComma: 'none',
+  useTabs: false
+};
