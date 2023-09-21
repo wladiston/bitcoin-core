@@ -1,4 +1,3 @@
-
 /**
  * Module dependencies.
  */
@@ -16,14 +15,16 @@ module.exports = class Requester {
   }
 
   /**
-  * Prepare rpc request.
-  */
+   * Prepare rpc request.
+   */
 
   prepare({ method, parameters = [], suffix }) {
     method = method.toLowerCase();
 
     if (this.version && !_.get(this.methods[method], 'supported', false)) {
-      throw new Error(`Method "${method}" is not supported by version "${this.version}"`);
+      throw new Error(
+        `Method "${method}" is not supported by version "${this.version}"`
+      );
     }
 
     return {

@@ -1,4 +1,3 @@
-
 /**
  * Module dependencies.
  */
@@ -11,12 +10,19 @@ const requestLogger = require('@uphold/request-logger');
  * Exports.
  */
 
-module.exports = logger => requestLogger(request, (request, instance) => {
-  obfuscate(request, instance);
+module.exports = logger =>
+  requestLogger(request, (request, instance) => {
+    obfuscate(request, instance);
 
-  if (request.type === 'response') {
-    return logger.debug({ request }, `Received response for request ${request.id}`);
-  }
+    if (request.type === 'response') {
+      return logger.debug(
+        { request },
+        `Received response for request ${request.id}`
+      );
+    }
 
-  return logger.debug({ request }, `Making request ${request.id} to ${request.method} ${request.uri}`);
-});
+    return logger.debug(
+      { request },
+      `Making request ${request.id} to ${request.method} ${request.uri}`
+    );
+  });

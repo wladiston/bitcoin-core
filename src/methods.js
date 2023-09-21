@@ -472,8 +472,30 @@ module.exports = {
     },
     obfuscate: {
       request: {
-        default: params => _.set(params, '[0]', _.map(params[0], request => _.set(request, 'keys', _.map(request.keys, () => '******')))),
-        named: params => _.set(params, 'requests', _.map(params.requests, request => _.set(request, 'keys', _.map(request.keys, () => '******'))))
+        default: params =>
+          _.set(
+            params,
+            '[0]',
+            _.map(params[0], request =>
+              _.set(
+                request,
+                'keys',
+                _.map(request.keys, () => '******')
+              )
+            )
+          ),
+        named: params =>
+          _.set(
+            params,
+            'requests',
+            _.map(params.requests, request =>
+              _.set(
+                request,
+                'keys',
+                _.map(request.keys, () => '******')
+              )
+            )
+          )
       }
     },
     version: '>=0.14.0'
@@ -763,8 +785,18 @@ module.exports = {
     category: 'rawtransactions',
     obfuscate: {
       request: {
-        default: params => _.set([...params], '[2]', _.map(params[2], () => '******')),
-        named: params => _.set(params, 'privkeys', _.map(params.privkeys || [], () => '******'))
+        default: params =>
+          _.set(
+            [...params],
+            '[2]',
+            _.map(params[2], () => '******')
+          ),
+        named: params =>
+          _.set(
+            params,
+            'privkeys',
+            _.map(params.privkeys || [], () => '******')
+          )
       }
     },
     version: '>=0.7.0 <0.18.0'
@@ -773,8 +805,18 @@ module.exports = {
     category: 'rawtransactions',
     obfuscate: {
       request: {
-        default: params => _.set([...params], '[1]', _.map(params[1], () => '******')),
-        named: params => _.set(params, 'privkeys', _.map(params.privkeys || [], () => '******'))
+        default: params =>
+          _.set(
+            [...params],
+            '[1]',
+            _.map(params[1], () => '******')
+          ),
+        named: params =>
+          _.set(
+            params,
+            'privkeys',
+            _.map(params.privkeys || [], () => '******')
+          )
       }
     },
     version: '>=0.17.0'
@@ -860,8 +902,14 @@ module.exports = {
     },
     obfuscate: {
       request: {
-        default: params => _.set(_.set([...params], '[0]', '******'), '[1]', '******'),
-        named: params => _.set(_.set(params, 'oldpassphrase', '******'), 'newpassphrase', '******')
+        default: params =>
+          _.set(_.set([...params], '[0]', '******'), '[1]', '******'),
+        named: params =>
+          _.set(
+            _.set(params, 'oldpassphrase', '******'),
+            'newpassphrase',
+            '******'
+          )
       }
     },
     version: '>=0.1.0'

@@ -1,4 +1,3 @@
-
 /**
  * Default config for Docker-based test suite.
  */

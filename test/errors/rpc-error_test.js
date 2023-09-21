@@ -1,4 +1,3 @@
-
 /**
  * Module dependencies.
  */
@@ -45,12 +44,16 @@ describe('RpcError', () => {
   });
 
   it('should return a well-formatted string representation', () => {
-    should(new RpcError(-32601, 'Method not found').toString()).equal('RpcError: -32601 Method not found');
+    should(new RpcError(-32601, 'Method not found').toString()).equal(
+      'RpcError: -32601 Method not found'
+    );
   });
 
   it('should return the correct message by its http code', () => {
     for (const code in STATUS_CODES) {
-      should(new RpcError(Number(code)).toString()).equal(`RpcError: ${code} ${STATUS_CODES[code]}`);
+      should(new RpcError(Number(code)).toString()).equal(
+        `RpcError: ${code} ${STATUS_CODES[code]}`
+      );
     }
   });
 });

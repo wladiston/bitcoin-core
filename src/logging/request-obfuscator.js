@@ -1,4 +1,3 @@
-
 /**
  * Module dependencies.
  */
@@ -53,7 +52,9 @@ function obfuscateResponse(request, instance) {
     return;
   }
 
-  if (_.get(request, `headers['content-type']`) === 'application/octet-stream') {
+  if (
+    _.get(request, `headers['content-type']`) === 'application/octet-stream'
+  ) {
     request.body = '******';
 
     return;
@@ -74,7 +75,9 @@ function obfuscateResponse(request, instance) {
   if (Array.isArray(request.body)) {
     const methodsById = _.mapKeys(requestBody, method => method.id);
 
-    request.body = _.map(request.body, request => obfuscateResponseBody(request, methodsById[request.id].method));
+    request.body = _.map(request.body, request =>
+      obfuscateResponseBody(request, methodsById[request.id].method)
+    );
   } else {
     request.body = obfuscateResponseBody(request.body, requestBody.method);
   }
@@ -137,7 +140,10 @@ function obfuscateHeaders(request) {
     return;
   }
 
-  request.headers.authorization = request.headers.authorization.replace(/(Basic )(.*)/, `$1******`);
+  request.headers.authorization = request.headers.authorization.replace(
+    /(Basic )(.*)/,
+    `$1******`
+  );
 }
 
 /**

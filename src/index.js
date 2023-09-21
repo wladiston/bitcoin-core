@@ -1,4 +1,3 @@
-
 /**
  * Module dependencies.
  */
@@ -25,17 +24,20 @@ const networks = {
  * Promisify helper.
  */
 
-const promisify = fn => (...args) => new Promise((resolve, reject) => {
-  fn(...args, (error, value) => {
-    if (error) {
-      reject(error);
+const promisify =
+  fn =>
+  (...args) =>
+    new Promise((resolve, reject) => {
+      fn(...args, (error, value) => {
+        if (error) {
+          reject(error);
 
-      return;
-    }
+          return;
+        }
 
-    resolve(value);
-  });
-});
+        resolve(value);
+      });
+    });
 
 /**
  * Constructor.
@@ -92,22 +94,34 @@ class Client {
     }
 
     this.version = version;
-    this.methods = _.transform(methods, (result, method, name) => {
-      result[_.toLower(name)] = {
-        features: _.transform(method.features, (result, constraint, name) => {
-          result[name] = {
-            supported: version ? semver.satisfies(version, constraint) : true
-          };
-        }, {}),
-        supported: version ? semver.satisfies(version, method.version) : true
-      };
-    }, {});
+    this.methods = _.transform(
+      methods,
+      (result, method, name) => {
+        result[_.toLower(name)] = {
+          features: _.transform(
+            method.features,
+            (result, constraint, name) => {
+              result[name] = {
+                supported: version
+                  ? semver.satisfies(version, constraint)
+                  : true
+              };
+            },
+            {}
+          ),
+          supported: version ? semver.satisfies(version, method.version) : true
+        };
+      },
+      {}
+    );
 
     const request = requestLogger(logger);
 
     this.request = request.defaults({
       agentOptions: this.agentOptions,
-      baseUrl: `${this.ssl.enabled ? 'https' : 'http'}://${this.host}:${this.port}`,
+      baseUrl: `${this.ssl.enabled ? 'https' : 'http'}://${this.host}:${
+        this.port
+      }`,
       strictSSL: this.ssl.strict,
       timeout: this.timeout
     });
@@ -129,20 +143,34 @@ class Client {
 
     if (isBatch) {
       multiwallet = _.some(input, command => {
-        return _.get(this.methods[command.method], 'features.multiwallet.supported', false) === true;
+        return (
+          _.get(
+            this.methods[command.method],
+            'features.multiwallet.supported',
+            false
+          ) === true
+        );
       });
 
-      body = input.map((method, index) => this.requester.prepare({
-        method: method.method,
-        parameters: method.parameters,
-        suffix: index
-      }));
+      body = input.map((method, index) =>
+        this.requester.prepare({
+          method: method.method,
+          parameters: method.parameters,
+          suffix: index
+        })
+      );
     } else {
-      if (this.hasNamedParametersSupport && parameters.length === 1 && _.isPlainObject(parameters[0])) {
+      if (
+        this.hasNamedParametersSupport &&
+        parameters.length === 1 &&
+        _.isPlainObject(parameters[0])
+      ) {
         parameters = parameters[0];
       }
 
-      multiwallet = _.get(this.methods[input], 'features.multiwallet.supported', false) === true;
+      multiwallet =
+        _.get(this.methods[input], 'features.multiwallet.supported', false) ===
+        true;
       body = this.requester.prepare({ method: input, parameters });
     }
 
@@ -154,11 +182,13 @@ class Client {
       uri = '/wallet/';
     }
 
-    return this.parser.rpc(await this.request.postAsync({
-      auth: _.pickBy(this.auth, _.identity),
-      body: JSON.stringify(body),
-      uri
-    }));
+    return this.parser.rpc(
+      await this.request.postAsync({
+        auth: _.pickBy(this.auth, _.identity),
+        body: JSON.stringify(body),
+        uri
+      })
+    );
   }
 
   /**
@@ -166,10 +196,13 @@ class Client {
    */
 
   async getTransactionByHash(hash, { extension = 'json' } = {}) {
-    return this.parser.rest(extension, await this.request.getAsync({
-      encoding: extension === 'bin' ? null : undefined,
-      url: `/rest/tx/${hash}.${extension}`
-    }));
+    return this.parser.rest(
+      extension,
+      await this.request.getAsync({
+        encoding: extension === 'bin' ? null : undefined,
+        url: `/rest/tx/${hash}.${extension}`
+      })
+    );
   }
 
   /**
@@ -180,9 +213,14 @@ class Client {
 
   async getBlockByHash(hash, { summary = false, extension = 'json' } = {}) {
     const encoding = extension === 'bin' ? null : undefined;
-    const url = `/rest/block${summary ? '/notxdetails/' : '/'}${hash}.${extension}`;
+    const url = `/rest/block${
+      summary ? '/notxdetails/' : '/'
+    }${hash}.${extension}`;
 
-    return this.parser.rest(extension, await this.request.getAsync({ encoding, url }));
+    return this.parser.rest(
+      extension,
+      await this.request.getAsync({ encoding, url })
+    );
   }
 
   /**
@@ -193,7 +231,10 @@ class Client {
     const encoding = extension === 'bin' ? null : undefined;
     const url = `/rest/headers/${count}/${hash}.${extension}`;
 
-    return this.parser.rest(extension, await this.request.getAsync({ encoding, url }));
+    return this.parser.rest(
+      extension,
+      await this.request.getAsync({ encoding, url })
+    );
   }
 
   /**
@@ -202,7 +243,10 @@ class Client {
    */
 
   async getBlockchainInformation() {
-    return this.parser.rest('json', await this.request.getAsync(`/rest/chaininfo.json`));
+    return this.parser.rest(
+      'json',
+      await this.request.getAsync(`/rest/chaininfo.json`)
+    );
   }
 
   /**
@@ -213,12 +257,17 @@ class Client {
 
   async getUnspentTransactionOutputs(outpoints, { extension = 'json' } = {}) {
     const encoding = extension === 'bin' ? null : undefined;
-    const sets = _.flatten([outpoints]).map(outpoint => {
-      return `${outpoint.id}-${outpoint.index}`;
-    }).join('/');
+    const sets = _.flatten([outpoints])
+      .map(outpoint => {
+        return `${outpoint.id}-${outpoint.index}`;
+      })
+      .join('/');
     const url = `/rest/getutxos/checkmempool/${sets}.${extension}`;
 
-    return this.parser.rest(extension, await this.request.getAsync({ encoding, url }));
+    return this.parser.rest(
+      extension,
+      await this.request.getAsync({ encoding, url })
+    );
   }
 
   /**
@@ -227,7 +276,10 @@ class Client {
    */
 
   async getMemoryPoolContent() {
-    return this.parser.rest('json', await this.request.getAsync('/rest/mempool/contents.json'));
+    return this.parser.rest(
+      'json',
+      await this.request.getAsync('/rest/mempool/contents.json')
+    );
   }
 
   /**
@@ -240,7 +292,10 @@ class Client {
    */
 
   async getMemoryPoolInformation() {
-    return this.parser.rest('json', await this.request.getAsync('/rest/mempool/info.json'));
+    return this.parser.rest(
+      'json',
+      await this.request.getAsync('/rest/mempool/info.json')
+    );
   }
 }
 
@@ -249,7 +304,10 @@ class Client {
  */
 
 _.forOwn(methods, (options, method) => {
-  Client.prototype[method] = _.partial(Client.prototype.command, method.toLowerCase());
+  Client.prototype[method] = _.partial(
+    Client.prototype.command,
+    method.toLowerCase()
+  );
 });
 
 /**

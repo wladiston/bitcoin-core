@@ -1,4 +1,3 @@
-
 /**
  * Module dependencies.
  */
@@ -57,7 +56,7 @@ describe('Client', () => {
       should.not.exist(new Client().password);
     });
 
-    it('should have default port set to `mainnet`\'s one', () => {
+    it("should have default port set to `mainnet`'s one", () => {
       should(new Client().port).equal(8332);
     });
 
@@ -89,13 +88,24 @@ describe('Client', () => {
     it('should have all the methods listed by `help`', async () => {
       const help = await new Client(config.bitcoin).help();
 
-      should(_.difference(_.without(parse(help), 'getaddressbyaccount'), _.invokeMap(Object.keys(methods), String.prototype.toLowerCase))).be.empty();
+      should(
+        _.difference(
+          _.without(parse(help), 'getaddressbyaccount'),
+          _.invokeMap(Object.keys(methods), String.prototype.toLowerCase)
+        )
+      ).be.empty();
     });
 
     it('should accept valid versions', async () => {
-      await new Client(_.defaults({ version: '0.15.0.1' }, config.bitcoin)).getNetworkInfo();
-      await new Client(_.defaults({ version: '0.15.0' }, config.bitcoin)).getNetworkInfo();
-      await new Client(_.defaults({ version: '0.17.0' }, config.bitcoin)).getNetworkInfo();
+      await new Client(
+        _.defaults({ version: '0.15.0.1' }, config.bitcoin)
+      ).getNetworkInfo();
+      await new Client(
+        _.defaults({ version: '0.15.0' }, config.bitcoin)
+      ).getNetworkInfo();
+      await new Client(
+        _.defaults({ version: '0.17.0' }, config.bitcoin)
+      ).getNetworkInfo();
     });
   });
 
@@ -103,7 +113,9 @@ describe('Client', () => {
     describe('general', () => {
       it('should throw an error if timeout is reached', async () => {
         try {
-          await new Client(_.defaults({ timeout: 1 }, config.bitcoin)).listUnspent();
+          await new Client(
+            _.defaults({ timeout: 1 }, config.bitcoin)
+          ).listUnspent();
 
           should.fail();
         } catch (e) {
@@ -125,7 +137,9 @@ describe('Client', () => {
 
       it('should throw an error if a connection cannot be established', async () => {
         try {
-          await new Client(_.defaults({ port: 9897 }, config.bitcoin)).getDifficulty();
+          await new Client(
+            _.defaults({ port: 9897 }, config.bitcoin)
+          ).getDifficulty();
 
           should.fail();
         } catch (e) {
@@ -138,13 +152,31 @@ describe('Client', () => {
 
     describe('ssl', () => {
       it('should use `ssl.strict` by default when `ssl` is enabled', () => {
-        const sslClient = new Client(_.defaults({ host: config.bitcoinSsl.host, port: config.bitcoinSsl.port, ssl: true }, config.bitcoin));
+        const sslClient = new Client(
+          _.defaults(
+            {
+              host: config.bitcoinSsl.host,
+              port: config.bitcoinSsl.port,
+              ssl: true
+            },
+            config.bitcoin
+          )
+        );
 
         should(sslClient.ssl.strict).be.true();
       });
 
       it('should throw an error if certificate is self signed by default', async () => {
-        const sslClient = new Client(_.defaults({ host: config.bitcoinSsl.host, port: config.bitcoinSsl.port, ssl: true }, config.bitcoin));
+        const sslClient = new Client(
+          _.defaults(
+            {
+              host: config.bitcoinSsl.host,
+              port: config.bitcoinSsl.port,
+              ssl: true
+            },
+            config.bitcoin
+          )
+        );
 
         should(sslClient.ssl.strict).be.true();
 
@@ -158,20 +190,27 @@ describe('Client', () => {
       });
 
       it('should establish a connection if certificate is self signed but `ca` agent option is passed', async () => {
-        const sslClient = new Client(_.defaults({
-          agentOptions: {
-            /* eslint-disable no-sync */
-            ca: fs.readFileSync(path.join(__dirname, '/config/ssl/cert.pem')),
-            checkServerIdentity() {
-              // Skip server identity checks otherwise the certificate would be immediately rejected
-              // as connecting to an IP not listed in the `altname` fails.
-              return;
-            }
-          },
-          host: config.bitcoinSsl.host,
-          port: config.bitcoinSsl.port,
-          ssl: true
-        }, config.bitcoin));
+        const sslClient = new Client(
+          _.defaults(
+            {
+              agentOptions: {
+                /* eslint-disable no-sync */
+                ca: fs.readFileSync(
+                  path.join(__dirname, '/config/ssl/cert.pem')
+                ),
+                checkServerIdentity() {
+                  // Skip server identity checks otherwise the certificate would be immediately rejected
+                  // as connecting to an IP not listed in the `altname` fails.
+                  return;
+                }
+              },
+              host: config.bitcoinSsl.host,
+              port: config.bitcoinSsl.port,
+              ssl: true
+            },
+            config.bitcoin
+          )
+        );
 
         const info = await sslClient.getInfo();
 
@@ -179,7 +218,16 @@ describe('Client', () => {
       });
 
       it('should establish a connection if certificate is self signed but `ssl.strict` is disabled', async () => {
-        const sslClient = new Client(_.defaults({ host: config.bitcoinSsl.host, port: config.bitcoinSsl.port, ssl: { enabled: true, strict: false } }, config.bitcoin));
+        const sslClient = new Client(
+          _.defaults(
+            {
+              host: config.bitcoinSsl.host,
+              port: config.bitcoinSsl.port,
+              ssl: { enabled: true, strict: false }
+            },
+            config.bitcoin
+          )
+        );
         const info = await sslClient.getInfo();
 
         should(info).not.be.empty();
@@ -189,7 +237,12 @@ describe('Client', () => {
     describe('authentication', () => {
       it('should throw an error if credentials are invalid', async () => {
         try {
-          await new Client(_.defaults({ password: 'biz', username: 'foowrong' }, config.bitcoin)).getDifficulty();
+          await new Client(
+            _.defaults(
+              { password: 'biz', username: 'foowrong' },
+              config.bitcoin
+            )
+          ).getDifficulty();
         } catch (e) {
           should(e).be.an.instanceOf(RpcError);
           should(e.message).equal('Unauthorized');
@@ -199,7 +252,9 @@ describe('Client', () => {
       });
 
       it('should support username only authentication', async () => {
-        const difficulty = await new Client(config.bitcoinUsernameOnly).getDifficulty();
+        const difficulty = await new Client(
+          config.bitcoinUsernameOnly
+        ).getDifficulty();
 
         should(difficulty).equal(0);
       });

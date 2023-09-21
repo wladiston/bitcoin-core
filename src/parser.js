@@ -1,4 +1,3 @@
-
 /**
  * Module dependencies.
  */
@@ -21,7 +20,11 @@ function getRpcResult(body, { headers = false, response } = {}) {
   if (body.error !== null) {
     throw new RpcError(
       _.get(body, 'error.code', -32603),
-      _.get(body, 'error.message', 'An error occurred while processing the RPC call to bitcoind')
+      _.get(
+        body,
+        'error.message',
+        'An error occurred while processing the RPC call to bitcoind'
+      )
     );
   }
 
@@ -53,8 +56,14 @@ module.exports = class Parser {
   rpc(response) {
     // The RPC api returns a `text/html; charset=ISO-8859-1` encoded response with an empty string as the body
     // when an error occurs.
-    if (typeof response.body === 'string' && response.headers['content-type'] !== 'application/json' && response.statusCode !== 200) {
-      throw new RpcError(response.statusCode, response.statusMessage, { body: response.body });
+    if (
+      typeof response.body === 'string' &&
+      response.headers['content-type'] !== 'application/json' &&
+      response.statusCode !== 200
+    ) {
+      throw new RpcError(response.statusCode, response.statusMessage, {
+        body: response.body
+      });
     }
 
     // Parsing the body with custom parser to support BigNumbers.
@@ -85,12 +94,19 @@ module.exports = class Parser {
     // characters \r\n. For readability and debuggability, the error message is set to this content.
     // When requesting a binary response, the body will be returned as a Buffer representation of
     // this error string.
-    if (response.headers['content-type'] !== 'application/json' && response.statusCode !== 200) {
+    if (
+      response.headers['content-type'] !== 'application/json' &&
+      response.statusCode !== 200
+    ) {
       if (response.body instanceof Buffer) {
         response.body = response.body.toString('utf-8');
       }
 
-      throw new RpcError(response.statusCode, response.body.replace('\r\n', ''), { body: response.body });
+      throw new RpcError(
+        response.statusCode,
+        response.body.replace('\r\n', ''),
+        { body: response.body }
+      );
     }
 
     // Parsing the body with custom parser to support BigNumbers.

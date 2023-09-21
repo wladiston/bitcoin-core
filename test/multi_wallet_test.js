@@ -1,4 +1,3 @@
-
 /**
  * Module dependencies.
  */
@@ -13,7 +12,12 @@ const should = require('should');
  * Test instance.
  */
 
-const client = new Client(_.defaults({ version: '0.17.0', wallet: 'wallet1' }, config.bitcoinMultiWallet));
+const client = new Client(
+  _.defaults(
+    { version: '0.17.0', wallet: 'wallet1' },
+    config.bitcoinMultiWallet
+  )
+);
 
 /**
  * Test `Client`.
@@ -40,7 +44,7 @@ describe('Multi Wallet', () => {
     });
 
     describe('getMemoryInfo()', () => {
-      it('should return information about the node\'s memory usage', async () => {
+      it("should return information about the node's memory usage", async () => {
         const info = await client.getMemoryInfo();
 
         should(info).have.keys('locked');
@@ -69,24 +73,35 @@ describe('Multi Wallet', () => {
     });
 
     describe('getBalance()', () => {
-      it('should return the total server\'s balance', async () => {
+      it("should return the total server's balance", async () => {
         const balance = await client.getBalance();
 
         should(balance).be.aboveOrEqual(0);
       });
 
       it('should support named parameters', async () => {
-        const mainWalletBalance = await client.getBalance({ dummy: '*', minconf: 0 });
-        const mainWalletBalanceWithoutNamedParameters = await client.getBalance('*', 0);
+        const mainWalletBalance = await client.getBalance({
+          dummy: '*',
+          minconf: 0
+        });
+        const mainWalletBalanceWithoutNamedParameters = await client.getBalance(
+          '*',
+          0
+        );
 
-        should(mainWalletBalance).equal(mainWalletBalanceWithoutNamedParameters);
+        should(mainWalletBalance).equal(
+          mainWalletBalanceWithoutNamedParameters
+        );
       });
     });
 
     describe('getNewAddress()', () => {
       it('should return a new bitcoin address', async () => {
         const address = await client.getNewAddress('test', 'legacy');
-        const amount = await client.getReceivedByAddress({ address, minconf: 0 });
+        const amount = await client.getReceivedByAddress({
+          address,
+          minconf: 0
+        });
 
         should(amount).equal(0);
       });
@@ -94,7 +109,12 @@ describe('Multi Wallet', () => {
 
     describe('createPsbt()', () => {
       it('should create a Psbt', async () => {
-        const inputs = [{ txid: '4fcfa1a5c6864c9783d9474566488cf3d0ae43087ae66618715f10a0dd7997e9', vout: 0 }];
+        const inputs = [
+          {
+            txid: '4fcfa1a5c6864c9783d9474566488cf3d0ae43087ae66618715f10a0dd7997e9',
+            vout: 0
+          }
+        ];
         const dest = [{ mkteeBFmGkraJaWN5WzqHCjmbQWVrPo5X3: 1000 }];
         const pbst = await client.createPsbt(inputs, dest);
 
@@ -200,9 +220,15 @@ describe('Multi Wallet', () => {
     describe('signRawTransactionWithWallet()', () => {
       it('should sign a funded raw transaction and return the hex', async () => {
         const address = await client.getNewAddress('test', 'legacy');
-        const rawTransaction = await client.createRawTransaction([], [{ [address]: 1 }]);
-        const fundedTransaction = await client.fundRawTransaction(rawTransaction);
-        const signedTransaction = await client.signRawTransactionWithWallet(fundedTransaction.hex);
+        const rawTransaction = await client.createRawTransaction(
+          [],
+          [{ [address]: 1 }]
+        );
+        const fundedTransaction =
+          await client.fundRawTransaction(rawTransaction);
+        const signedTransaction = await client.signRawTransactionWithWallet(
+          fundedTransaction.hex
+        );
 
         should(signedTransaction).have.keys('hex');
         should(signedTransaction.hex).be.a.String();
@@ -210,9 +236,15 @@ describe('Multi Wallet', () => {
 
       it('should support named parameters', async () => {
         const address = await client.getNewAddress('test', 'legacy');
-        const rawTransaction = await client.createRawTransaction([], [{ [address]: 1 }]);
-        const fundedTransaction = await client.fundRawTransaction(rawTransaction);
-        const signedTransaction = await client.signRawTransactionWithWallet({ hexstring: fundedTransaction.hex });
+        const rawTransaction = await client.createRawTransaction(
+          [],
+          [{ [address]: 1 }]
+        );
+        const fundedTransaction =
+          await client.fundRawTransaction(rawTransaction);
+        const signedTransaction = await client.signRawTransactionWithWallet({
+          hexstring: fundedTransaction.hex
+        });
 
         should(signedTransaction).have.keys('hex');
         should(signedTransaction.hex).be.a.String();
@@ -231,7 +263,11 @@ describe('Multi Wallet', () => {
 
       const response = await client.command(batch);
 
-      should(response).eql([0, ['', 'wallet1', 'wallet2'], ['', 'wallet1', 'wallet2']]);
+      should(response).eql([
+        0,
+        ['', 'wallet1', 'wallet2'],
+        ['', 'wallet1', 'wallet2']
+      ]);
     });
 
     it('should return an error if one of the request fails', async () => {
@@ -247,7 +283,12 @@ describe('Multi Wallet', () => {
 
   describe('default wallet', () => {
     it('should return the balance for the default wallet with multiple wallets loaded if `allowDefaultWallet` is true', async () => {
-      const client = new Client(_.defaults({ allowDefaultWallet: true, version: '0.17.0' }, config.bitcoinMultiWallet));
+      const client = new Client(
+        _.defaults(
+          { allowDefaultWallet: true, version: '0.17.0' },
+          config.bitcoinMultiWallet
+        )
+      );
 
       const balance = await client.getBalance();
 
@@ -255,7 +296,9 @@ describe('Multi Wallet', () => {
     });
 
     it('should fail getting balance for default wallet with `allowDefaultWallet` as `false`', async () => {
-      const client = new Client(_.defaults({ version: '0.17.0' }, config.bitcoinMultiWallet));
+      const client = new Client(
+        _.defaults({ version: '0.17.0' }, config.bitcoinMultiWallet)
+      );
 
       try {
         await client.getBalance();
@@ -264,7 +307,9 @@ describe('Multi Wallet', () => {
       } catch (error) {
         should(error).be.an.instanceOf(RpcError);
         should(error.code).be.equal(-19);
-        should(error.message).containEql('Wallet file not specified (must request wallet RPC through /wallet/<filename> uri-path).');
+        should(error.message).containEql(
+          'Wallet file not specified (must request wallet RPC through /wallet/<filename> uri-path).'
+        );
       }
     });
   });

@@ -1,4 +1,3 @@
-
 /**
  * Module dependencies.
  */
@@ -40,7 +39,7 @@ describe('Single Wallet', () => {
     });
 
     describe('getMemoryInfo()', () => {
-      it('should return information about the node\'s memory usage', async () => {
+      it("should return information about the node's memory usage", async () => {
         const info = await client.getMemoryInfo();
 
         should(info).have.keys('locked');
@@ -71,19 +70,29 @@ describe('Single Wallet', () => {
     });
 
     describe('getBalance()', () => {
-      it('should return the total server\'s balance', async () => {
+      it("should return the total server's balance", async () => {
         const balance = await client.getBalance();
 
         should(balance).be.aboveOrEqual(0);
       });
 
       it('should support named parameters', async () => {
-        const client = new Client(_.defaults({ version: '0.17.0' }, config.bitcoin));
+        const client = new Client(
+          _.defaults({ version: '0.17.0' }, config.bitcoin)
+        );
 
-        const mainWalletBalance = await client.getBalance({ dummy: '*', minconf: 0 });
-        const mainWalletBalanceWithoutNamedParameters = await client.getBalance('*', 0);
+        const mainWalletBalance = await client.getBalance({
+          dummy: '*',
+          minconf: 0
+        });
+        const mainWalletBalanceWithoutNamedParameters = await client.getBalance(
+          '*',
+          0
+        );
 
-        should(mainWalletBalance).equal(mainWalletBalanceWithoutNamedParameters);
+        should(mainWalletBalance).equal(
+          mainWalletBalanceWithoutNamedParameters
+        );
       });
     });
 
@@ -138,13 +147,17 @@ describe('Single Wallet', () => {
           await client.sendToAddress(address, 0.1);
         }
 
-        let transactions = await new Client(_.defaults({ version: '0.17.0' }, config.bitcoin)).listTransactions();
+        let transactions = await new Client(
+          _.defaults({ version: '0.17.0' }, config.bitcoin)
+        ).listTransactions();
 
         should(transactions).be.an.Array();
         should(transactions.length).be.greaterThanOrEqual(5);
 
         // Make sure `count` is read correctly.
-        transactions = await new Client(_.defaults({ version: '0.17.0' }, config.bitcoin)).listTransactions({ count: 1 });
+        transactions = await new Client(
+          _.defaults({ version: '0.17.0' }, config.bitcoin)
+        ).listTransactions({ count: 1 });
 
         should(transactions).be.an.Array();
         should(transactions).have.length(1);
@@ -167,20 +180,43 @@ describe('Single Wallet', () => {
     });
 
     it('should support request parameters in batched requests', async () => {
-      const batch = [{ method: 'getnewaddress' }, { method: 'validateaddress', parameters: ['mkteeBFmGkraJaWN5WzqHCjmbQWVrPo5X3'] }];
+      const batch = [
+        { method: 'getnewaddress' },
+        {
+          method: 'validateaddress',
+          parameters: ['mkteeBFmGkraJaWN5WzqHCjmbQWVrPo5X3']
+        }
+      ];
 
       const [newAddress, addressValidation] = await client.command(batch);
 
-      should(addressValidation).have.properties('address', 'isvalid', 'scriptPubKey', 'isscript', 'iswitness');
+      should(addressValidation).have.properties(
+        'address',
+        'isvalid',
+        'scriptPubKey',
+        'isscript',
+        'iswitness'
+      );
       should(newAddress).be.a.String();
     });
 
     it('should return an error if one of the request fails', async () => {
-      const batch = [{ method: 'validateaddress' }, { method: 'validateaddress', parameters: ['mkteeBFmGkraJaWN5WzqHCjmbQWVrPo5X3'] }];
+      const batch = [
+        { method: 'validateaddress' },
+        {
+          method: 'validateaddress',
+          parameters: ['mkteeBFmGkraJaWN5WzqHCjmbQWVrPo5X3']
+        }
+      ];
 
-      const [validateAddressError, validateAddress] = await client.command(batch);
+      const [validateAddressError, validateAddress] =
+        await client.command(batch);
 
-      should(validateAddress).have.properties('address', 'isvalid', 'scriptPubKey');
+      should(validateAddress).have.properties(
+        'address',
+        'isvalid',
+        'scriptPubKey'
+      );
       should(validateAddressError).be.an.instanceOf(RpcError);
       should(validateAddressError.code).equal(-1);
     });
